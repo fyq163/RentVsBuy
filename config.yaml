@@ -1,0 +1,89 @@
+# Configuration for rentVSbuy
+# All amounts in CNY (RMB). Use integers (no 万 unit).
+
+home:
+  pv: 6300000                # Total house price (e.g., 6,300,000 = 630 万)
+  currency: CNY
+  down_payment: 2500000      # t0一次性首付
+  renovation_cost: 300000    # 装修费用（已确认：30 万），t0 一次性付清
+  renovation_paid_at: "t0"
+  maintenance_monthly: 250   # 每月维修/养护支出
+  salvage_value: 2000000     # 期末残值 R
+
+rent:
+  initial_monthly_rent: 10000
+  growth_mode: cpi           # options: cpi | fixed | custom
+  annual_adjustment: true    # 同一年内月租不变，按年度调整
+
+macro:
+  cpi:
+    source: "data\\Inflation-data.xlsx"
+    sheet: "hcpi_m"
+    country: "CHN"
+    scenario:
+      method: piecewise
+      start_year: 2023
+      dip:
+        years: 5
+        min_rate: -0.0179    # -1.79% in decimal
+      recovery:
+        years: 7
+        target_rate: 0.02   # 2% in decimal at recovery end
+      long_term_mean: 0.019 # long-run CPI growth
+  loan_rate:
+    source: "data\\china_loan_rate_wdi.csv"
+    regression:
+      x_field: "cpi_yearly"
+      y_field: "OBS_VALUE"
+      use_ols: true
+
+loan:
+  term_years: 30
+  n_periods: 360           # total number of monthly periods (term_years * 12)
+  rate_adjustment: annual
+  prepay_year: 10
+  initial_rate: 0.0305      # fixed initial annual mortgage rate (decimal). Set to null to use regression
+
+discount:
+  rate: 0.035               # 3.5% p.a.
+
+scenarios:
+  - id: s1_prepay_annuity
+    name: "prepay_annuity"
+    prepay: true
+    payment_type: annuity          # 等额本息
+  - id: s2_prepay_equal_principal
+    name: "prepay_equal_principal"
+    prepay: true
+    payment_type: equal_principal # 等额本金
+  - id: s3_no_prepay_annuity
+    name: "no_prepay_annuity"
+    prepay: false
+    payment_type: annuity
+  - id: s4_no_prepay_equal_principal
+    name: "no_prepay_equal_principal"
+    prepay: false
+    payment_type: equal_principal
+
+output:
+  directory: "data\\outputs"
+  append: true
+  formats:
+    - csv
+    - parquet
+  filenames:
+    monthly: "cashflow_monthly_{run_id}.{format}"
+    summary: "scenario_summary_{run_id}.{format}"
+
+run:
+  run_id_template: "{timestamp}"
+  timestamp_format: "%Y%m%d%H%M%S"
+
+data_sources:
+  cpi_file: "data\\Inflation-data.xlsx"
+  loan_rate_file: "data\\china_loan_rate_wdi.csv"
+
+notes:
+  - "Amounts are in CNY (RMB) and represented as integers (no 万 unit)."
+  - "Rent growth is driven by CPI path; same-year rent is fixed."
+  - "Renovation cost defaults to 300000 and charged at t0."
