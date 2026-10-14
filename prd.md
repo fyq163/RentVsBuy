@@ -1,5 +1,13 @@
 # Rent vs Buy PRD
-
+agent plan:{
+  "summary": "- 已把两条新口径写入文档：`房租增长率 = CPI 增长率`，`装修 30 万纳入买房现金流并进入 config.yaml`\n- 已更新 [readme.md](c:\\Users\\Administrator\\PycharmProjects\\rentVSbuy\\readme.md) 和 [prd.md](c:\\Users\\Administrator\\PycharmProjects\\rentVSbuy\\prd.md)，明确四组情景、append 输出、计划新增文件与阶段拆分\n- 已写入详细实现计划到 `C:\\Users\\Administrator\\.copilot\\session-state\\a8b8ed7b-674c-4ee5-9bee-ab74cfcda01a\\plan.md`\n- 实施顺序已拆为：`config.yaml` → 宏观路径 → 买房现金流 → 租房现金流 → 情景输出 → 图表 → 文档收口\n- 仍待锁定 3 个实现细节：`n` 的正式口径、是否保留 `FV`、append 输出优先用 `csv` 还是 `parquet`",
+  "actions": [
+    "exit_only",
+    "interactive",
+    "autopilot"
+  ],
+  "recommendedAction": "interactive"
+}
 ## 文档定位
 
 本文件面向内部分析与建模，用于沉淀项目的目标、边界、假设、变量定义、计算流程、输出形式、配置口径与实施计划。对外介绍、仓库结构与当前状态见 [readme.md](c:\Users\Administrator\PycharmProjects\rentVSbuy\readme.md)。
@@ -11,7 +19,8 @@
 1. 哪个方案的资金压力更小？
 2. 哪个方案的现值更优？
 3. 不同情景和输入下，结论是否变化？
-4. 输出应当支持 append，而不是每次覆写，方便后续多轮对比。
+4. 画线展示实时的PV增长情况，如果有交叉，哪一年发生的交叉
+5. 输出应当支持 append，而不是每次覆写，方便后续多轮对比。
 
 ## 情景组合
 
