@@ -257,13 +257,18 @@ const piecewiseBlock = el("div", { class: "controls" });
 const flatBlock = el("div", { class: "controls" });
 const cpiHint = el("p", { class: "field-hint" }, [""]);
 
+function setVisible(node: HTMLElement, visible: boolean) {
+  node.classList.toggle("u-hidden", !visible);
+  node.hidden = !visible;
+}
+
 function syncPathVisibility() {
-  piecewiseBlock.hidden = state.cpiMethod !== "piecewise";
-  flatBlock.hidden = state.cpiMethod !== "flat";
+  setVisible(piecewiseBlock, state.cpiMethod === "piecewise");
+  setVisible(flatBlock, state.cpiMethod === "flat");
   cpiHint.textContent =
     state.cpiMethod === "piecewise"
-      ? "租金与房贷共用这条 CPI 路径；敏感度 k 在「更多假设」里调。"
-      : "每年同一 CPI，租金与房贷共用；敏感度 k 在「更多假设」里调。";
+      ? "当前是路径模式：改下面的下跌/复苏/长期参数才会动图。要调「每年同一 CPI」请先切到「恒定」。"
+      : "当前是恒定模式：改「每年 CPI」会同时带动租金与房贷。";
 }
 
 const loanPrincipalLabel = el("strong", {}, [
@@ -293,7 +298,7 @@ const prepayDetailBlock = el("div", { class: "controls" }, [
     state.prepayMode,
     (v) => {
       state.prepayMode = v;
-      prepayAmountField.hidden = v !== "amount";
+      setVisible(prepayAmountField, state.prepay && v === "amount");
       refresh();
     },
   ),
@@ -301,8 +306,8 @@ const prepayDetailBlock = el("div", { class: "controls" }, [
 ]);
 
 function syncPrepayVisibility() {
-  prepayDetailBlock.hidden = !state.prepay;
-  prepayAmountField.hidden = !state.prepay || state.prepayMode !== "amount";
+  setVisible(prepayDetailBlock, state.prepay);
+  setVisible(prepayAmountField, state.prepay && state.prepayMode === "amount");
 }
 
 function onHomeChange() {

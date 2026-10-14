@@ -146,6 +146,11 @@ body {
   gap: 0.85rem;
 }
 
+/* Beat .controls { display:grid } — native [hidden] alone is not enough here. */
+.u-hidden {
+  display: none !important;
+}
+
 .field {
   display: grid;
   gap: 0.3rem;
